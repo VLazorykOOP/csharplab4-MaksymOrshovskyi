@@ -7,6 +7,7 @@ class Program
         Console.WriteLine("Виберіть клас для використання:");
         Console.WriteLine("1. Клас Triangle");
         Console.WriteLine("2. Клас VectorUInt");
+        Console.WriteLine("3. Клас MatrixUint");
 
         // Зчитуємо вибір користувача
         string choice = Console.ReadLine();
@@ -18,6 +19,9 @@ class Program
                 break;
             case "2":
                 UseVectorUIntClass();
+                break;
+            case "3":
+                UseMatrixUintClass();
                 break;
             default:
                 Console.WriteLine("Невірний вибір.");
@@ -397,3 +401,217 @@ class Program
         Console.WriteLine($"Кількість векторів: {VectorUInt.CountVectors()}");
     }
 }
+
+//________________________ task 3
+
+public class MatrixUint
+{
+    private uint[,] IntArray;
+    private int n, m;
+    private int codeError;
+    private static int num_m;
+
+    // Конструктор без параметрів
+    public MatrixUint()
+    {
+        n = 1;
+        m = 1;
+        IntArray = new uint[n, m];
+        codeError = 0;
+        num_m++;
+    }
+
+    // Конструктор з двома параметрами - розміри вектора
+    public MatrixUint(int rows, int columns)
+    {
+        n = rows;
+        m = columns;
+        IntArray = new uint[n, m];
+        codeError = 0;
+        num_m++;
+    }
+
+    // Конструктор з трьома параметрами - розміри вектора та значення ініціалізації
+    public MatrixUint(int rows, int columns, uint initialValue)
+    {
+        n = rows;
+        m = columns;
+        IntArray = new uint[n, m];
+        codeError = 0;
+        num_m++;
+
+        for (int i = 0; i < n; i++)
+        {
+            for (int j = 0; j < m; j++)
+            {
+                IntArray[i, j] = initialValue;
+            }
+        }
+    }
+
+    // Деструктор
+    ~MatrixUint()
+    {
+        Console.WriteLine("MatrixUint object is being deleted.");
+    }
+
+    // Метод для вводу елементів вектора з клавіатури
+    public void InputElements()
+    {
+        Console.WriteLine("Enter elements of the matrix:");
+
+        for (int i = 0; i < n; i++)
+        {
+            for (int j = 0; j < m; j++)
+            {
+                Console.Write($"IntArray[{i}, {j}]: ");
+                IntArray[i, j] = Convert.ToUInt32(Console.ReadLine());
+            }
+        }
+    }
+
+    // Метод для виводу елементів вектора на екран
+    public void PrintElements()
+    {
+        Console.WriteLine("Matrix elements:");
+
+        for (int i = 0; i < n; i++)
+        {
+            for (int j = 0; j < m; j++)
+            {
+                Console.Write(IntArray[i, j] + "\t");
+            }
+            Console.WriteLine();
+        }
+    }
+
+    // Властивість для отримання розмірів матриці (доступ тільки для читання)
+    public int RowCount
+    {
+        get { return n; }
+    }
+
+    public int ColumnCount
+    {
+        get { return m; }
+    }
+
+    // Властивість для отримання або встановлення значення поля codeError
+    public int CodeError
+    {
+        get { return codeError; }
+        set { codeError = value; }
+    }
+
+    // Індексатор з двома індексами
+    public uint this[int i, int j]
+    {
+        get
+        {
+            if (i < 0 || i >= n || j < 0 || j >= m)
+            {
+                codeError = -1;
+                return 0;
+            }
+            else
+            {
+                return IntArray[i, j];
+            }
+        }
+        set
+        {
+            if (i >= 0 && i < n && j >= 0 && j < m)
+            {
+                IntArray[i, j] = value;
+            }
+            else
+            {
+                codeError = -1;
+            }
+        }
+    }
+
+    // Перевантаження унарних операцій
+    public static MatrixUint operator ++(MatrixUint matrix)
+    {
+        for (int i = 0; i < matrix.n; i++)
+        {
+            for (int j = 0; j < matrix.m; j++)
+            {
+                matrix.IntArray[i, j]++;
+            }
+        }
+        return matrix;
+    }
+
+    public static MatrixUint operator --(MatrixUint matrix)
+    {
+        for (int i = 0; i < matrix.n; i++)
+        {
+            for (int j = 0; j < matrix.m; j++)
+            {
+                matrix.IntArray[i, j]--;
+            }
+        }
+        return matrix;
+    }
+
+    public static bool operator true(MatrixUint matrix)
+    {
+        return matrix.n != 0 && matrix.m != 0 && !matrix.IsEmpty();
+    }
+
+    public static bool operator false(MatrixUint matrix)
+    {
+        return matrix.n == 0 || matrix.m == 0 || matrix.IsEmpty();
+    }
+
+    public bool IsEmpty()
+    {
+        for (int i = 0; i < n; i++)
+        {
+            for (int j = 0; j < m; j++)
+            {
+                if (IntArray[i, j] != 0)
+                {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    // Перевантаження бінарних операцій
+    public static MatrixUint operator +(MatrixUint matrix1, MatrixUint matrix2)
+    {
+        if (matrix1.n != matrix2.n || matrix1.m != matrix2.m)
+        {
+            return matrix1;
+        }
+
+        MatrixUint result = new MatrixUint(matrix1.n, matrix1.m);
+        for (int i = 0; i < matrix1.n; i++)
+        {
+            for (int j = 0; j < matrix1.m; j++)
+            {
+                result.IntArray[i, j] = matrix1.IntArray[i, j] + matrix2.IntArray[i, j];
+            }
+        }
+        return result;
+    }
+
+    public static MatrixUint operator +(MatrixUint matrix, uint scalar)
+    {
+        MatrixUint result = new MatrixUint(matrix.n, matrix.m);
+        for (int i = 0; i < matrix.n; i++)
+        {
+            for (int j = 0; j < matrix.m; j++)
+            {
+                result.IntArray[i, j] = matrix.IntArray[i, j] + scalar;
+            }
+        }
+        return result;
+    }
+
+   }
+
