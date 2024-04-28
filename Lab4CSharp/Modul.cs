@@ -1,5 +1,30 @@
 using System;
 
+class Program
+{
+    static void Main()
+    {
+        Console.WriteLine("Виберіть клас для використання:");
+        Console.WriteLine("1. Клас Triangle");
+        Console.WriteLine("2. Клас VectorUInt");
+
+        // Зчитуємо вибір користувача
+        string choice = Console.ReadLine();
+
+        switch (choice)
+        {
+            case "1":
+                UseTriangleClass();
+                break;
+            case "2":
+                UseVectorUIntClass();
+                break;
+            default:
+                Console.WriteLine("Невірний вибір.");
+                break;
+        }
+    }
+
 class Triangle
 {
     // Захищені поля класу
@@ -160,5 +185,215 @@ class Program
 
         // Перетворення в рядок
         Console.WriteLine(triangle1.ToString());
+    }
+}
+
+//___________________________ task 2
+
+class VectorUInt
+{
+    protected uint[] IntArray;
+    protected uint size;
+    protected int codeError;
+    protected static uint num_vec;
+
+    // Конструктори
+    public VectorUInt()
+    {
+        size = 1;
+        IntArray = new uint[size];
+        num_vec++;
+    }
+
+    public VectorUInt(uint vectorSize)
+    {
+        size = vectorSize;
+        IntArray = new uint[size];
+        num_vec++;
+    }
+
+    public VectorUInt(uint vectorSize, uint initValue)
+    {
+        size = vectorSize;
+        IntArray = new uint[size];
+        for (int i = 0; i < size; i++)
+        {
+            IntArray[i] = initValue;
+        }
+        num_vec++;
+    }
+
+    // Деструктор
+    ~VectorUInt()
+    {
+        Console.WriteLine("Вектор був видалений.");
+    }
+
+    // Методи
+    public void InputElements()
+    {
+        for (int i = 0; i < size; i++)
+        {
+            Console.Write($"Введіть елемент {i}: ");
+            IntArray[i] = Convert.ToUInt32(Console.ReadLine());
+        }
+    }
+
+    public void DisplayElements()
+    {
+        Console.WriteLine("Елементи вектора:");
+        for (int i = 0; i < size; i++)
+        {
+            Console.Write($"{IntArray[i]} ");
+        }
+        Console.WriteLine();
+    }
+
+    public void AssignElements(uint value)
+    {
+        for (int i = 0; i < size; i++)
+        {
+            IntArray[i] = value;
+        }
+    }
+
+    public static uint CountVectors()
+    {
+        return num_vec;
+    }
+
+    // Властивості
+    public uint Size
+    {
+        get { return size; }
+    }
+
+    public int CodeError
+    {
+        get { return codeError; }
+        set { codeError = value; }
+    }
+
+    // Індексатор
+    public uint this[int index]
+    {
+        get
+        {
+            if (index < 0 || index >= size)
+            {
+                codeError = -1;
+                return 0;
+            }
+            else
+            {
+                return IntArray[index];
+            }
+        }
+        set
+        {
+            if (index < 0 || index >= size)
+            {
+                codeError = -1;
+            }
+            else
+            {
+                IntArray[index] = value;
+            }
+        }
+    }
+
+    // Перевантаження операторів
+    public static VectorUInt operator ++(VectorUInt vec)
+    {
+        for (int i = 0; i < vec.size; i++)
+        {
+            vec.IntArray[i]++;
+        }
+        return vec;
+    }
+
+    public static VectorUInt operator --(VectorUInt vec)
+    {
+        for (int i = 0; i < vec.size; i++)
+        {
+            vec.IntArray[i]--;
+        }
+        return vec;
+    }
+
+    public static bool operator true(VectorUInt vec)
+    {
+        for (int i = 0; i < vec.size; i++)
+        {
+            if (vec.IntArray[i] == 0)
+                return false;
+        }
+        return true;
+    }
+
+    public static bool operator false(VectorUInt vec)
+    {
+        if (vec.size == 0)
+            return true;
+
+        for (int i = 0; i < vec.size; i++)
+        {
+            if (vec.IntArray[i] == 0)
+                return true;
+        }
+        return false;
+    }
+
+    public static bool operator !(VectorUInt vec)
+    {
+        for (int i = 0; i < vec.size; i++)
+        {
+            if (vec.IntArray[i] == 0)
+                return true;
+        }
+        return false;
+    }
+
+    // Додаткові бінарні операції (приклад)
+    public static VectorUInt operator +(VectorUInt vec1, VectorUInt vec2)
+    {
+        uint maxSize = Math.Max(vec1.size, vec2.size);
+        VectorUInt result = new VectorUInt(maxSize);
+
+        for (int i = 0; i < maxSize; i++)
+        {
+            uint val1 = (i < vec1.size) ? vec1.IntArray[i] : 0;
+            uint val2 = (i < vec2.size) ? vec2.IntArray[i] : 0;
+            result.IntArray[i] = val1 + val2;
+        }
+
+        return result;
+    }
+}
+
+class Program
+{
+    static void Main()
+    {
+        // Приклад використання класу VectorUInt
+        VectorUInt vec1 = new VectorUInt(3, 10);
+        VectorUInt vec2 = new VectorUInt(4, 5);
+
+        // Введення та вивід елементів
+        vec1.InputElements();
+        vec1.DisplayElements();
+
+        // Операції з векторами
+        VectorUInt sumVec = vec1 + vec2;
+        sumVec.DisplayElements();
+
+        // Перевірка умов true та false
+        if (!vec1)
+            Console.WriteLine("vec1 містить нульові елементи.");
+        else
+            Console.WriteLine("vec1 не містить нульових елементів.");
+
+        // Підрахунок кількості створених векторів
+        Console.WriteLine($"Кількість векторів: {VectorUInt.CountVectors()}");
     }
 }
